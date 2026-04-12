@@ -11,56 +11,56 @@
 <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVmVsb2NpcmVhZGVyIiwic2hvcnRfbmFtZSI6IlZlbG9jaXJlYWRlciIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGEwYTBjIiwidGhlbWVfY29sb3IiOiIjMGEwYTBjIn0=">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0a0a0c; --surface:#131318; --border:#1e1e26; --text:#e8e6f0;
-  --muted:#6b6880; --accent:#ff2d46; --glow:rgba(255,45,70,0.25); --input:#0e0e12;
-}
+:root{--bg:#0a0a0c;--surface:#131318;--border:#1e1e26;--text:#e8e6f0;--muted:#6b6880;--accent:#2dd882;--glow:rgba(45,216,130,0.22);--input:#0e0e12}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 input,textarea,button{font-family:inherit}
-
-/* Screens */
 .screen{display:none;width:100%;height:100%;position:absolute;inset:0;flex-direction:column;align-items:center;overflow:auto;-webkit-overflow-scrolling:touch}
 .screen.active{display:flex}
-
-/* Glow */
 .glow{position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,var(--glow) 0%,transparent 70%);pointer-events:none;opacity:.4}
 
-/* Library */
-.lib-wrap{position:relative;z-index:1;width:100%;max-width:640px;padding:2rem 1.5rem;display:flex;flex-direction:column;align-items:center}
+/* ── Library ── */
+.lib-wrap{position:relative;z-index:1;width:100%;max-width:640px;padding:2rem 1.5rem 4rem}
+.lib-center{display:flex;flex-direction:column;align-items:center}
 .logo{font-size:2.2rem;font-weight:800;letter-spacing:-1px;margin-top:2.5rem;margin-bottom:.2rem}
 .logo b{color:var(--accent);font-weight:800}
 .tagline{color:var(--muted);font-size:.8rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:2rem;font-weight:300}
-.new-btn{width:100%;padding:.85rem;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:.9rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 24px var(--glow)}
-.lib-section-title{font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin:1.5rem 0 .75rem;align-self:flex-start}
-.lib-card{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;cursor:pointer;width:100%;margin-bottom:.5rem;transition:border-color .2s}
-.lib-card:active{border-color:var(--muted)}
-.lib-card-body{flex:1;min-width:0}
-.lib-title-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem}
-.lib-title{font-size:.92rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lib-progress-row{display:flex;align-items:center;gap:.75rem}
+.new-btn{width:100%;padding:.85rem;background:var(--accent);border:none;border-radius:10px;color:#0a0a0c;font-size:.9rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 24px var(--glow)}
+.lib-section-title{font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin:1.5rem 0 .75rem}
+.lib-card{display:flex;align-items:center;gap:.5rem;padding:.75rem .85rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;margin-bottom:.5rem;transition:all .15s;position:relative}
+.lib-card.dragging{opacity:.35;border-color:var(--accent)}
+.lib-card.drag-over-top{border-top:2px solid var(--accent)}
+.lib-drag-handle{color:var(--muted);cursor:grab;padding:4px;display:flex;align-items:center;touch-action:none;opacity:.35}
+.lib-drag-handle:active{opacity:1}
+.lib-card-body{flex:1;min-width:0;cursor:pointer}
+.lib-title-row{display:flex;align-items:center;gap:.4rem;margin-bottom:.2rem}
+.lib-title{font-size:.88rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-date{font-size:.58rem;color:var(--muted);font-family:'JetBrains Mono',monospace;opacity:.5;margin-top:.15rem}
+.lib-progress-row{display:flex;align-items:center;gap:.6rem}
 .progress-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
-.lib-pct{font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;white-space:nowrap}
-.lib-meta{font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:.25rem}
-.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:8px;border-radius:4px;display:flex;align-items:center}
-.del-btn:active{color:var(--accent)}
+.lib-pct{font-size:.66rem;color:var(--muted);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.lib-meta{font-size:.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:.15rem}
+.lib-actions{display:flex;flex-direction:column;gap:1px}
+.act-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:4px;display:flex;align-items:center}
+.act-btn:active{color:var(--accent)}
+.lib-title-edit{background:var(--input);border:1px solid var(--accent);border-radius:4px;color:var(--text);font-size:.88rem;font-weight:600;padding:2px 6px;outline:none;width:100%;font-family:'Outfit',sans-serif}
 
-/* Input screen */
+/* ── Input ── */
 .input-wrap{position:relative;z-index:1;width:100%;max-width:640px;padding:2rem 1.5rem}
 .back-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:.45rem .9rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.2rem}
 .back-btn:active{border-color:var(--muted);color:var(--text)}
 .title-input{width:100%;padding:.7rem 1rem;background:var(--input);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1rem;font-weight:600;outline:none;margin-bottom:1rem}
 .title-input:focus{border-color:var(--accent)}
 .tab-bar{display:flex}
-.tab{flex:1;padding:.7rem .75rem;background:transparent;border:1px solid var(--border);border-bottom:none;color:var(--muted);font-size:.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:8px 8px 0 0;transition:all .2s}
+.tab{flex:1;padding:.65rem .5rem;background:transparent;border:1px solid var(--border);border-bottom:none;color:var(--muted);font-size:.68rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:8px 8px 0 0;transition:all .2s}
 .tab.active{background:var(--surface);color:var(--text)}
 .tab-content{background:var(--surface);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:1.2rem}
-.text-area{width:100%;height:200px;background:var(--input);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;padding:1rem;resize:none;outline:none}
+.text-area{width:100%;height:180px;background:var(--input);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;padding:1rem;resize:none;outline:none}
 .text-area:focus{border-color:var(--accent)}
 .text-area::placeholder{color:var(--muted);opacity:.5}
-.drop-zone{width:100%;height:200px;border:2px dashed var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;cursor:pointer;position:relative;transition:border-color .25s}
+.drop-zone{width:100%;height:180px;border:2px dashed var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;cursor:pointer;position:relative;transition:border-color .25s}
 .drop-zone:active{border-color:var(--accent)}
 .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .file-loaded{color:var(--accent);font-weight:600;font-size:.9rem}
@@ -68,528 +68,348 @@ input,textarea,button{font-family:inherit}
 .wpm-label{font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;white-space:nowrap}
 .wpm-input{width:80px;padding:.6rem .5rem;background:var(--input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;text-align:center;outline:none}
 .wpm-input:focus{border-color:var(--accent)}
-.wpm-unit{color:var(--muted);font-size:.75rem;font-weight:300}
-.start-btn{flex:1;padding:.7rem 1.5rem;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 24px var(--glow)}
+.start-btn{flex:1;padding:.7rem 1.5rem;background:var(--accent);border:none;border-radius:8px;color:#0a0a0c;font-size:.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 24px var(--glow)}
 .start-btn:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
 .word-count-info{margin-top:.5rem;font-size:.7rem;color:var(--muted);text-align:right;font-family:'JetBrains Mono',monospace;opacity:.6}
 
-/* Reader */
+/* ── Reader ── */
 .reader-screen{justify-content:center}
 .reader-top{position:absolute;top:0;left:0;right:0;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:10}
-.reader-title{position:absolute;top:3.2rem;left:0;right:0;text-align:center;font-size:.72rem;color:var(--muted);font-weight:300;letter-spacing:1px;opacity:.5;padding:0 4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reader-title{position:absolute;top:3.2rem;left:0;right:0;text-align:center;font-size:2.2rem;color:var(--text);font-weight:800;letter-spacing:-.5px;opacity:.85;padding:0 1.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reader-chapter{position:absolute;top:6.2rem;left:0;right:0;text-align:center;font-size:1.4rem;color:var(--accent);font-weight:600;letter-spacing:.3px;opacity:.7;padding:0 2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1em}
 .reader-wpm{display:flex;align-items:center;gap:.5rem}
 .reader-wpm input{width:68px;padding:.4rem .5rem;background:var(--input);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;text-align:center;outline:none}
 .reader-wpm input:focus{border-color:var(--accent)}
 .reader-wpm span{font-size:.7rem;color:var(--muted);letter-spacing:1px}
-
 .focus-area{position:relative;width:100%;display:flex;align-items:center;justify-content:center;min-height:120px;padding:0 .5rem}
 .focus-line{position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:100%;background:linear-gradient(to bottom,transparent,var(--accent) 30%,var(--accent) 70%,transparent);opacity:.15}
 .word-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-family:'JetBrains Mono',monospace;font-size:clamp(2.2rem,7vw,4.5rem);font-weight:700;letter-spacing:2px;white-space:nowrap;user-select:none;min-height:1.2em;width:100%}
-.w-before{text-align:right;color:var(--text)}
-.w-focus{text-align:center;color:var(--accent)}
-.w-after{text-align:left;color:var(--text)}
-.w-emoji{text-align:center;font-size:3.5rem}
-
-.word-counter{position:absolute;bottom:6.5rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);opacity:.5}
-.controls{position:absolute;bottom:2.5rem;display:flex;align-items:center;gap:1.5rem}
+.w-before{text-align:right;color:var(--text)}.w-focus{text-align:center;color:var(--accent)}.w-after{text-align:left;color:var(--text)}.w-emoji{text-align:center;font-size:3.5rem}
+.word-counter{position:absolute;bottom:7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);opacity:.5}
+.controls{position:absolute;bottom:2.8rem;display:flex;align-items:center;gap:1.5rem}
 .ctrl-btn{background:none;border:1px solid var(--border);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer}
 .ctrl-btn:active{border-color:var(--muted);color:var(--text)}
 .play-btn{background:none;border:1px solid var(--accent);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;color:var(--accent);cursor:pointer}
-.play-btn:active{background:var(--accent);color:#fff}
-.time-remaining{position:absolute;bottom:1rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);opacity:.4}
-.progress-bottom{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--border)}
-.progress-bottom-fill{height:100%;background:var(--accent);transition:width .15s linear}
+.play-btn:active{background:var(--accent);color:#0a0a0c}
+.time-remaining{position:absolute;bottom:1.2rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);opacity:.4}
+.scrub-area{position:absolute;bottom:0;left:0;right:0;height:28px;cursor:pointer;display:flex;align-items:flex-end;z-index:20;touch-action:none}
+.scrub-track{width:100%;height:4px;background:var(--border);position:relative;transition:height .15s}
+.scrub-area:hover .scrub-track,.scrub-area.scrubbing .scrub-track{height:10px}
+.scrub-fill{height:100%;background:var(--accent);pointer-events:none;position:relative}
+.scrub-handle{position:absolute;top:50%;right:-7px;transform:translateY(-50%);width:14px;height:14px;background:var(--accent);border-radius:50%;opacity:0;transition:opacity .15s;pointer-events:none;box-shadow:0 0 8px var(--glow)}
+.scrub-area:hover .scrub-handle,.scrub-area.scrubbing .scrub-handle{opacity:1}
 
-/* safe areas for notch phones */
+/* ── Summary ── */
+.summary-wrap{position:relative;z-index:1;width:100%;max-width:640px;padding:2rem 1.5rem 4rem;display:flex;flex-direction:column}
+.summary-title{font-size:1.2rem;font-weight:800;margin-bottom:.3rem}
+.summary-stats{display:flex;gap:1.2rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.summary-stat{display:flex;flex-direction:column;gap:.05rem}
+.summary-stat-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--accent)}
+.summary-stat-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.summary-body{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;line-height:1.75;font-size:.85rem;color:var(--text);white-space:pre-wrap;flex:1;overflow:auto;min-height:120px}
+.summary-loading{color:var(--muted);font-style:italic}
+.summary-actions{display:flex;gap:.75rem;margin-top:1.2rem}
+.summary-btn{flex:1;padding:.7rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;text-align:center}
+.summary-btn:active{border-color:var(--accent)}
+.summary-btn-primary{background:var(--accent);color:#0a0a0c;border-color:var(--accent)}
+
 @supports(padding-top:env(safe-area-inset-top)){
   .reader-top{padding-top:calc(1rem + env(safe-area-inset-top))}
   .reader-title{top:calc(3.2rem + env(safe-area-inset-top))}
-  .lib-wrap,.input-wrap{padding-top:calc(2rem + env(safe-area-inset-top))}
+  .reader-chapter{top:calc(6.2rem + env(safe-area-inset-top))}
+  .lib-wrap,.input-wrap,.summary-wrap{padding-top:calc(2rem + env(safe-area-inset-top))}
 }
 </style>
 </head>
 <body>
 
-<!-- ════════ LIBRARY SCREEN ════════ -->
+<!-- LIBRARY -->
 <div id="libraryScreen" class="screen active">
-  <div class="glow"></div>
-  <div class="lib-wrap">
+<div class="glow"></div>
+<div class="lib-wrap">
+  <div class="lib-center">
     <div class="logo">Veloci<b>reader</b></div>
     <div class="tagline">one word at a time</div>
-    <button class="new-btn" onclick="showInput()">+ New Reading</button>
-    <div id="libraryList"></div>
   </div>
+  <button class="new-btn" onclick="showInput()">+ New Reading</button>
+  <div id="libraryList"></div>
+</div>
 </div>
 
-<!-- ════════ INPUT SCREEN ════════ -->
+<!-- INPUT -->
 <div id="inputScreen" class="screen">
-  <div class="glow"></div>
-  <div class="input-wrap">
-    <button class="back-btn" onclick="showLibrary()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Library
-    </button>
-    <input id="titleInput" class="title-input" type="text" placeholder="Reading title">
-    <div class="tab-bar">
-      <button class="tab active" data-tab="text" onclick="switchTab('text')">Paste Text</button>
-      <button class="tab" data-tab="file" onclick="switchTab('file')">Upload File</button>
-    </div>
-    <div class="tab-content">
-      <textarea id="textInput" class="text-area" placeholder="Paste or type your text here..."></textarea>
-      <div id="dropZone" class="drop-zone" style="display:none">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.35"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-        <p style="color:var(--muted);font-size:.85rem">Drop a file or tap to browse</p>
-        <span style="color:var(--muted);font-size:.68rem;opacity:.5;letter-spacing:1px">PDF / TXT / MD / HTML / CSV</span>
-        <input type="file" id="fileInput" accept=".txt,.md,.html,.csv,.json,.log,.xml,.rtf,.pdf">
-      </div>
-    </div>
-    <div class="wpm-row">
-      <span class="wpm-label">Speed</span>
-      <input type="number" id="wpmInput" class="wpm-input" value="250" min="10" max="2000">
-      <span class="wpm-unit">WPM</span>
-      <button id="startBtn" class="start-btn" disabled onclick="startNewReading()">Start</button>
-    </div>
-    <div id="wordCountInfo" class="word-count-info"></div>
+<div class="glow"></div>
+<div class="input-wrap">
+  <button class="back-btn" onclick="showLibrary()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Library</button>
+  <input id="titleInput" class="title-input" type="text" placeholder="Reading title">
+  <div class="tab-bar">
+    <button class="tab active" data-tab="text" onclick="switchTab('text')">Paste Text</button>
+    <button class="tab" data-tab="file" onclick="switchTab('file')">Upload File</button>
   </div>
+  <div class="tab-content">
+    <textarea id="textInput" class="text-area" placeholder="Paste or type your text here..."></textarea>
+    <div id="dropZone" class="drop-zone" style="display:none">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.35"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p style="color:var(--muted);font-size:.85rem">Drop a file or tap to browse</p>
+      <span style="color:var(--muted);font-size:.68rem;opacity:.5;letter-spacing:1px">PDF / TXT / MD / HTML / CSV</span>
+      <input type="file" id="fileInput" accept=".txt,.md,.html,.csv,.json,.log,.xml,.rtf,.pdf">
+    </div>
+  </div>
+  <div class="wpm-row">
+    <span class="wpm-label">Speed</span>
+    <input type="number" id="wpmInput" class="wpm-input" value="350" min="10" max="2000">
+    <span style="color:var(--muted);font-size:.75rem;font-weight:300">WPM</span>
+    <button id="startBtn" class="start-btn" disabled onclick="startNewReading()">Start</button>
+  </div>
+  <div id="wordCountInfo" class="word-count-info"></div>
+</div>
 </div>
 
-<!-- ════════ READER SCREEN ════════ -->
+<!-- READER -->
 <div id="readerScreen" class="screen reader-screen">
   <div class="reader-top">
-    <button class="back-btn" onclick="exitReader()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Back
-    </button>
-    <div class="reader-wpm">
-      <input type="number" id="readerWpm" value="250" min="10" max="2000">
-      <span>WPM</span>
-    </div>
+    <button class="back-btn" onclick="exitReader()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back</button>
+    <div class="reader-wpm"><input type="number" id="readerWpm" value="350" min="10" max="2000"><span>WPM</span></div>
   </div>
   <div id="readerTitle" class="reader-title"></div>
-
+  <div id="readerChapter" class="reader-chapter"></div>
   <div class="focus-area">
     <div class="focus-line"></div>
-    <div id="wordBox" class="word-grid">
-      <span class="w-before"></span><span class="w-focus"></span><span class="w-after"></span>
-    </div>
+    <div id="wordBox" class="word-grid"><span class="w-before"></span><span class="w-focus"></span><span class="w-after"></span></div>
   </div>
-
   <div id="wordCounter" class="word-counter"></div>
-
   <div class="controls">
-    <button class="ctrl-btn" onclick="skip(-10)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
-    </button>
-    <button id="playBtn" class="play-btn" onclick="togglePlay()">
+    <button class="ctrl-btn" onclick="skip(-10)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+    <button class="play-btn" onclick="togglePlay()">
       <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
       <svg id="pauseIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
     </button>
-    <button class="ctrl-btn" onclick="skip(10)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
-    </button>
+    <button class="ctrl-btn" onclick="skip(10)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></button>
   </div>
-
   <div id="timeRemaining" class="time-remaining"></div>
-  <div class="progress-bottom"><div id="progressBar" class="progress-bottom-fill"></div></div>
+  <div id="scrubArea" class="scrub-area"><div class="scrub-track"><div id="scrubFill" class="scrub-fill" style="width:0%"><div class="scrub-handle"></div></div></div></div>
+</div>
+
+<!-- SUMMARY -->
+<div id="summaryScreen" class="screen">
+<div class="glow"></div>
+<div class="summary-wrap">
+  <button class="back-btn" onclick="showLibrary()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Library</button>
+  <div style="font-size:2rem;margin-bottom:.3rem">👍</div>
+  <h2 class="summary-title" id="summaryTitle"></h2>
+  <div class="summary-stats" id="summaryStats"></div>
+  <div class="summary-body" id="summaryBody"></div>
+  <div class="summary-actions">
+    <button class="summary-btn" onclick="restartReading()">Read Again</button>
+    <button class="summary-btn summary-btn-primary" onclick="showLibrary()">Done</button>
+  </div>
+</div>
 </div>
 
 <script>
-// ══════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════
-let library = [];
-let activeId = null;
-let wordData = [];    // [{word, pause}]
-let words = [];       // cleaned strings
-let idx = 0;
-let playing = false;
-let finished = false;
-let timer = null;
-let saveTimer = null;
+// ═══════ STATE ═══════
+let library=[],activeId=null,wordData=[],words=[],idx=0;
+let playing=false,finished=false,timer=null,readingStartTime=0,scrubbing=false;
+let headings=[],touchDragId=null,dragId=null;
+const STORE='velocireader-library';
+function loadLib(){try{library=JSON.parse(localStorage.getItem(STORE))||[];}catch{library=[];}}
+function saveLib(){try{localStorage.setItem(STORE,JSON.stringify(library));}catch(e){console.error(e);}}
 
-// ══════════════════════════════════════
-//  STORAGE (localStorage)
-// ══════════════════════════════════════
-const STORE_KEY = 'velocireader-library';
+// ═══════ TEXT ═══════
+function extractWordsAndMeta(t){
+  const raw=t.split(/\s+/).filter(w=>w.length>0),res=[];
+  for(const w of raw){const last=w.trim().slice(-1);let pause=0;
+    if('.?!'.includes(last))pause=1.5;else if(';:'.includes(last))pause=1.0;else if(','.includes(last))pause=0.5;
+    let c=w.replace(/[^a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜçÇ0-9'\-]/g,'');
+    c=c.replace(/^['\-]+|['\-]+$/g,'');if(c.length>0)res.push({word:c,pause});}return res;}
+function getORP(w){const l=w.length;if(l<=1)return 0;if(l<=3)return 0;if(l<=5)return 1;if(l<=9)return 2;if(l<=13)return 3;return 4;}
 
-function loadLib() {
-  try { library = JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { library = []; }
-}
-function saveLib() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(library)); } catch(e) { console.error(e); }
-}
+function extractHeadings(text){
+  const lines=text.split('\n');let wo=0;const h=[];
+  for(const line of lines){const tr=line.trim();const lw=extractWordsAndMeta(tr);
+    if(tr.length>0&&lw.length>=1&&lw.length<=12){
+      const ep=tr.slice(-1)==='.';
+      const lh=!ep&&(tr===tr.toUpperCase()||/^(chapter|section|part|\d+[\.\):])/i.test(tr)||/^#+\s/.test(tr)||(lw.length<=8&&/^[A-ZÁÉÍÓÚÑÜ]/.test(tr)));
+      if(lh){const ct=tr.replace(/^#+\s*/,'').replace(/^\d+[\.\):]\s*/,'');if(ct.length>0)h.push({wordIndex:wo,text:ct});}}
+    wo+=lw.length;}return h;}
+function getCurrentHeading(i){let c='';for(const h of headings){if(h.wordIndex<=i)c=h.text;else break;}return c;}
 
-// ══════════════════════════════════════
-//  TEXT PROCESSING
-// ══════════════════════════════════════
-function extractWordsAndMeta(text) {
-  const raw = text.split(/\s+/).filter(w => w.length > 0);
-  const res = [];
-  for (const w of raw) {
-    const last = w.trim().slice(-1);
-    let pause = 0;
-    if ('.?!'.includes(last)) pause = 1.5;
-    else if (';:'.includes(last)) pause = 1.0;
-    else if (','.includes(last)) pause = 0.5;
-    let c = w.replace(/[^a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜçÇ0-9'\-]/g, '');
-    c = c.replace(/^['\-]+|['\-]+$/g, '');
-    if (c.length > 0) res.push({ word: c, pause });
-  }
-  return res;
-}
+// ═══════ RENDER ═══════
+function renderWord(w){const box=document.getElementById('wordBox');
+  if(!w){box.innerHTML='<span class="w-before"></span><span class="w-focus"></span><span class="w-after"></span>';return;}
+  const o=getORP(w);box.innerHTML=`<span class="w-before">${w.slice(0,o)}</span><span class="w-focus">${w[o]}</span><span class="w-after">${w.slice(o+1)}</span>`;}
+function updateProgress(){const total=words.length,pct=total>0?(idx/total)*100:0;
+  document.getElementById('scrubFill').style.width=Math.min(pct,100)+'%';
+  document.getElementById('wordCounter').textContent=`${idx} / ${total}`;
+  const wpm=parseInt(document.getElementById('readerWpm').value)||350,rem=total-idx,secs=Math.ceil((rem/wpm)*60),m=Math.floor(secs/60),s=secs%60;
+  document.getElementById('timeRemaining').textContent=`${m}:${String(s).padStart(2,'0')} remaining`;
+  document.getElementById('readerChapter').textContent=getCurrentHeading(idx);}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function fmtDate(ts){if(!ts)return'';const d=new Date(ts);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 
-function getORP(word) {
-  const l = word.length;
-  if (l<=1) return 0; if (l<=3) return 0; if (l<=5) return 1;
-  if (l<=9) return 2; if (l<=13) return 3; return 4;
-}
-
-// ══════════════════════════════════════
-//  RENDERING
-// ══════════════════════════════════════
-function renderWord(w) {
-  const box = document.getElementById('wordBox');
-  if (!w) { box.innerHTML='<span class="w-before"></span><span class="w-focus"></span><span class="w-after"></span>'; return; }
-  const o = getORP(w);
-  box.innerHTML =
-    `<span class="w-before">${w.slice(0,o)}</span>` +
-    `<span class="w-focus">${w[o]}</span>` +
-    `<span class="w-after">${w.slice(o+1)}</span>`;
-}
-
-function renderFinished() {
-  document.getElementById('wordBox').innerHTML =
-    '<span class="w-before"></span><span class="w-emoji">👍</span><span class="w-after"></span>';
-}
-
-function updateProgress() {
-  const total = words.length;
-  const pct = total > 0 ? (idx / total) * 100 : 0;
-  document.getElementById('progressBar').style.width = Math.min(pct,100) + '%';
-  document.getElementById('wordCounter').textContent = `${idx} / ${total}`;
-  const wpm = parseInt(document.getElementById('readerWpm').value) || 250;
-  const rem = total - idx;
-  const secs = Math.ceil((rem / wpm) * 60);
-  const m = Math.floor(secs/60), s = secs%60;
-  document.getElementById('timeRemaining').textContent = `${m}:${String(s).padStart(2,'0')} remaining`;
-}
-
-// ══════════════════════════════════════
-//  SCREENS
-// ══════════════════════════════════════
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function showLibrary() {
-  renderLibrary();
-  show('libraryScreen');
-}
-
-function showInput() {
-  document.getElementById('textInput').value = '';
-  document.getElementById('titleInput').value = '';
-  resetDropZone();
-  updateWordCount();
-  switchTab('text');
-  show('inputScreen');
-}
-
-function renderLibrary() {
-  const container = document.getElementById('libraryList');
-  if (library.length === 0) { container.innerHTML = ''; return; }
-  let html = '<p class="lib-section-title">Your Readings</p>';
-  for (const item of library) {
-    const pct = item.totalWords > 0 ? Math.round((item.currentIndex / item.totalWords) * 100) : 0;
-    const fin = pct >= 100;
-    html += `
-    <div class="lib-card" onclick="resumeReading('${item.id}')">
-      <div class="lib-card-body">
-        <div class="lib-title-row">
-          <span class="lib-title">${esc(item.title)}</span>
-          ${fin ? '<span style="font-size:.8rem">👍</span>' : ''}
-        </div>
-        <div class="lib-progress-row">
-          <div class="progress-track"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div>
-          <span class="lib-pct">${pct}%</span>
-        </div>
-        <p class="lib-meta">${item.totalWords} words / ${item.wpm} wpm</p>
+// ═══════ LIBRARY ═══════
+function showLibrary(){touchDragId=null;renderLibrary();show('libraryScreen');}
+function renderLibrary(){
+  const c=document.getElementById('libraryList');if(library.length===0){c.innerHTML='';return;}
+  let h='<p class="lib-section-title">Your Readings</p>';
+  for(const item of library){const pct=item.totalWords>0?Math.round((item.currentIndex/item.totalWords)*100):0;const fin=pct>=100;
+    h+=`<div class="lib-card${touchDragId===item.id?' dragging':''}" draggable="true" data-id="${item.id}"
+      ondragstart="onDS(event,'${item.id}')" ondragover="onDO(event)" ondragenter="onDE(event,'${item.id}')"
+      ondragleave="onDL(event)" ondrop="onDD(event,'${item.id}')" ondragend="onDEnd(event)">
+      <div class="lib-drag-handle" ontouchend="onTR(event,'${item.id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
       </div>
-      <button class="del-btn" onclick="event.stopPropagation();deleteReading('${item.id}')" title="Delete">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
-    </div>`;
-  }
-  container.innerHTML = html;
-}
+      <div class="lib-card-body" onclick="resumeReading('${item.id}')">
+        <div class="lib-title-row"><span class="lib-title">${esc(item.title)}</span>${fin?'<span style="font-size:.72rem">👍</span>':''}</div>
+        <div class="lib-progress-row"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div><span class="lib-pct">${pct}%</span></div>
+        <p class="lib-meta">${item.totalWords} words / ${item.wpm} wpm</p>
+        <p class="lib-date">${fmtDate(item.createdAt)}</p>
+      </div>
+      <div class="lib-actions">
+        <button class="act-btn" onclick="event.stopPropagation();editTitle('${item.id}',this)" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="act-btn" onclick="event.stopPropagation();deleteReading('${item.id}')" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div></div>`;}
+  c.innerHTML=h;}
 
-function esc(s) { const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+function onDS(e,id){dragId=id;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function onDO(e){e.preventDefault();}
+function onDE(e,id){e.preventDefault();if(id!==dragId)e.currentTarget.classList.add('drag-over-top');}
+function onDL(e){e.currentTarget.classList.remove('drag-over-top');}
+function onDEnd(){document.querySelectorAll('.lib-card').forEach(c=>c.classList.remove('dragging','drag-over-top'));dragId=null;}
+function onDD(e,tid){e.preventDefault();e.currentTarget.classList.remove('drag-over-top');
+  if(!dragId||dragId===tid)return;const fi=library.findIndex(r=>r.id===dragId),ti=library.findIndex(r=>r.id===tid);
+  if(fi<0||ti<0)return;const[item]=library.splice(fi,1);library.splice(ti,0,item);saveLib();renderLibrary();}
+function onTR(e,id){e.stopPropagation();e.preventDefault();
+  if(touchDragId&&touchDragId!==id){const fi=library.findIndex(r=>r.id===touchDragId),ti=library.findIndex(r=>r.id===id);
+    if(fi>=0&&ti>=0){const[item]=library.splice(fi,1);library.splice(ti,0,item);saveLib();}touchDragId=null;renderLibrary();
+  }else if(touchDragId===id){touchDragId=null;renderLibrary();}else{touchDragId=id;renderLibrary();}}
+function editTitle(id,btn){const card=btn.closest('.lib-card'),el=card.querySelector('.lib-title'),item=library.find(r=>r.id===id);if(!item)return;
+  const inp=document.createElement('input');inp.className='lib-title-edit';inp.value=item.title;el.replaceWith(inp);inp.focus();inp.select();
+  function sv(){const v=inp.value.trim()||'Untitled';item.title=v;saveLib();renderLibrary();}
+  inp.addEventListener('blur',sv);inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sv();}if(e.key==='Escape')renderLibrary();});}
+function deleteReading(id){library=library.filter(r=>r.id!==id);saveLib();renderLibrary();}
 
-// ══════════════════════════════════════
-//  INPUT SCREEN
-// ══════════════════════════════════════
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
-  document.getElementById('textInput').style.display = tab==='text' ? '' : 'none';
-  document.getElementById('dropZone').style.display = tab==='file' ? 'flex' : 'none';
-}
+// ═══════ INPUT ═══════
+function showInput(){document.getElementById('textInput').value='';document.getElementById('titleInput').value='';
+  resetDropZone();updateWordCount();switchTab('text');show('inputScreen');}
+function switchTab(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  document.getElementById('textInput').style.display=t==='text'?'':'none';
+  document.getElementById('dropZone').style.display=t==='file'?'flex':'none';}
+function updateWordCount(){const w=extractWordsAndMeta(document.getElementById('textInput').value);
+  document.getElementById('startBtn').disabled=w.length===0;const wpm=parseInt(document.getElementById('wpmInput').value)||350;
+  document.getElementById('wordCountInfo').textContent=w.length>0?`${w.length} words ~ ${Math.ceil(w.length/wpm)} min`:'';}
+document.getElementById('textInput').addEventListener('input',updateWordCount);
+document.getElementById('wpmInput').addEventListener('input',updateWordCount);
 
-function updateWordCount() {
-  const w = extractWordsAndMeta(document.getElementById('textInput').value);
-  const btn = document.getElementById('startBtn');
-  btn.disabled = w.length === 0;
-  const info = document.getElementById('wordCountInfo');
-  const wpm = parseInt(document.getElementById('wpmInput').value) || 250;
-  info.textContent = w.length > 0 ? `${w.length} words ~ ${Math.ceil(w.length/wpm)} min` : '';
-}
-
-// File handling — uses event delegation on dropZone so we never lose listeners
-document.getElementById('textInput').addEventListener('input', updateWordCount);
-document.getElementById('wpmInput').addEventListener('input', updateWordCount);
-
-function bindDropZone() {
-  const dz = document.getElementById('dropZone');
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor='var(--accent)'; });
-  dz.addEventListener('dragleave', () => { dz.style.borderColor=''; });
-  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor='';
-    if(e.dataTransfer.files.length){ document.getElementById('fileInput').files=e.dataTransfer.files; handleFile(); }
-  });
-  document.getElementById('fileInput').addEventListener('change', handleFile);
-}
+function bindDropZone(){const dz=document.getElementById('dropZone');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='var(--accent)';});
+  dz.addEventListener('dragleave',()=>{dz.style.borderColor='';});
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.style.borderColor='';if(e.dataTransfer.files.length){document.getElementById('fileInput').files=e.dataTransfer.files;handleFile();}});
+  document.getElementById('fileInput').addEventListener('change',handleFile);}
 bindDropZone();
+function resetDropZone(){document.getElementById('dropZone').innerHTML=`
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.35"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+  <p style="color:var(--muted);font-size:.85rem">Drop a file or tap to browse</p>
+  <span style="color:var(--muted);font-size:.68rem;opacity:.5;letter-spacing:1px">PDF / TXT / MD / HTML / CSV</span>
+  <input type="file" id="fileInput" accept=".txt,.md,.html,.csv,.json,.log,.xml,.rtf,.pdf">`;
+  document.getElementById('fileInput').addEventListener('change',handleFile);}
 
-function resetDropZone() {
-  const dz = document.getElementById('dropZone');
-  dz.innerHTML = `
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.35"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-    <p style="color:var(--muted);font-size:.85rem">Drop a file or tap to browse</p>
-    <span style="color:var(--muted);font-size:.68rem;opacity:.5;letter-spacing:1px">PDF / TXT / MD / HTML / CSV</span>
-    <input type="file" id="fileInput" accept=".txt,.md,.html,.csv,.json,.log,.xml,.rtf,.pdf">`;
-  // Rebind listener on the fresh file input
-  document.getElementById('fileInput').addEventListener('change', handleFile);
-}
+function handleFile(){const fi=document.getElementById('fileInput'),file=fi.files[0];if(!file)return;
+  const ext=file.name.split('.').pop().toLowerCase(),ti=document.getElementById('titleInput');if(!ti.value)ti.value=file.name.replace(/\.[^.]+$/,'');
+  if(ext==='pdf'){document.getElementById('dropZone').innerHTML='<p style="color:var(--muted)">Loading PDF...</p>';
+    loadPdfJs().then(()=>{const r=new FileReader();r.onload=async e=>{try{const pdf=await pdfjsLib.getDocument({data:new Uint8Array(e.target.result)}).promise;let t='';
+      for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i),c=await pg.getTextContent();t+=c.items.map(x=>x.str).join(' ')+'\n';}
+      document.getElementById('textInput').value=t;updateWordCount();
+      document.getElementById('dropZone').innerHTML=`<p class="file-loaded">${esc(file.name)}</p><p style="color:var(--muted);font-size:.75rem;margin-top:.3rem">${pdf.numPages} pages / ${extractWordsAndMeta(t).length} words</p>`;
+    }catch(err){console.error(err);document.getElementById('dropZone').innerHTML='<p style="color:var(--accent)">Could not read PDF</p>';}};r.readAsArrayBuffer(file);});
+  }else{const r=new FileReader();r.onload=e=>{let t=e.target.result;if(ext==='html'||ext==='htm'){t=new DOMParser().parseFromString(t,'text/html').body.textContent||'';}
+    document.getElementById('textInput').value=t;updateWordCount();
+    document.getElementById('dropZone').innerHTML=`<p class="file-loaded">${esc(file.name)}</p><p style="color:var(--muted);font-size:.75rem;margin-top:.3rem">${extractWordsAndMeta(t).length} words</p>`;};r.readAsText(file);}}
 
-function handleFile() {
-  const fi = document.getElementById('fileInput');
-  const file = fi.files[0];
-  if (!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  const ti = document.getElementById('titleInput');
-  if (!ti.value) ti.value = file.name.replace(/\.[^.]+$/,'');
+let pdfJsReady=false;
+function loadPdfJs(){return new Promise((res,rej)=>{if(pdfJsReady)return res();const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';pdfJsReady=true;res();};s.onerror=rej;document.head.appendChild(s);});}
 
-  if (ext === 'pdf') {
-    document.getElementById('dropZone').innerHTML =
-      '<p style="color:var(--muted);font-size:.85rem">Loading PDF...</p>';
-    loadPdfJs().then(() => {
-      const reader = new FileReader();
-      reader.onload = async e => {
-        try {
-          const pdf = await pdfjsLib.getDocument({data:new Uint8Array(e.target.result)}).promise;
-          let text = '';
-          for (let i=1;i<=pdf.numPages;i++){
-            const pg=await pdf.getPage(i);
-            const c=await pg.getTextContent();
-            text+=c.items.map(x=>x.str).join(' ')+' ';
-          }
-          document.getElementById('textInput').value = text;
-          updateWordCount();
-          const wc = extractWordsAndMeta(text).length;
-          document.getElementById('dropZone').innerHTML =
-            `<p class="file-loaded">${esc(file.name)}</p><p style="color:var(--muted);font-size:.75rem;margin-top:.3rem">${pdf.numPages} pages / ${wc} words</p>`;
-        } catch(err) {
-          console.error(err);
-          document.getElementById('dropZone').innerHTML =
-            '<p style="color:var(--accent);font-size:.85rem">Could not read PDF</p>';
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  } else {
-    const reader = new FileReader();
-    reader.onload = e => {
-      let text = e.target.result;
-      if (ext==='html'||ext==='htm') {
-        const doc = new DOMParser().parseFromString(text,'text/html');
-        text = doc.body.textContent || '';
-      }
-      document.getElementById('textInput').value = text;
-      updateWordCount();
-      const wc = extractWordsAndMeta(text).length;
-      document.getElementById('dropZone').innerHTML =
-        `<p class="file-loaded">${esc(file.name)}</p><p style="color:var(--muted);font-size:.75rem;margin-top:.3rem">${wc} words</p>`;
-    };
-    reader.readAsText(file);
-  }
-}
+// ═══════ URL EXTRACTION ═══════
+// ═══════ READER ═══════
+function startNewReading(){const text=document.getElementById('textInput').value,title=document.getElementById('titleInput').value||'Untitled',
+  wpm=parseInt(document.getElementById('wpmInput').value)||350;wordData=extractWordsAndMeta(text);words=wordData.map(w=>w.word);if(!words.length)return;
+  headings=extractHeadings(text);
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const reading={id,title,text,wpm,currentIndex:0,totalWords:words.length,createdAt:Date.now()};
+  library.unshift(reading);saveLib();openReader(reading);}
+function resumeReading(id){const item=library.find(r=>r.id===id);if(!item)return;
+  wordData=extractWordsAndMeta(item.text);words=wordData.map(w=>w.word);headings=extractHeadings(item.text);openReader(item);}
+function openReader(r){activeId=r.id;idx=r.currentIndex||0;finished=false;playing=false;readingStartTime=Date.now();
+  document.getElementById('readerWpm').value=r.wpm;document.getElementById('readerTitle').textContent=r.title;
+  document.getElementById('playIcon').style.display='';document.getElementById('pauseIcon').style.display='none';
+  if(idx>=words.length){idx=words.length;finished=true;showSummary();return;}
+  renderWord(words[idx]);updateProgress();show('readerScreen');}
+function exitReader(){stopPlay();saveProgress();activeId=null;showLibrary();}
+function saveProgress(){if(!activeId)return;const wpm=parseInt(document.getElementById('readerWpm').value)||350;
+  const r=library.find(x=>x.id===activeId);if(r){r.currentIndex=idx;r.wpm=wpm;saveLib();}}
+function getBaseMs(){return(60/(parseInt(document.getElementById('readerWpm').value)||350))*1000;}
+function getDelayForIndex(i){const b=getBaseMs(),m=wordData[i];return b+(m?b*m.pause:0);}
+function tick(){idx++;if(idx>=words.length){idx=words.length;finished=true;stopPlay();saveProgress();showSummary();return;}
+  renderWord(words[idx]);updateProgress();saveProgress();timer=setTimeout(tick,getDelayForIndex(idx));}
+function togglePlay(){playing?stopPlay():startPlay();}
+function startPlay(){if(finished){idx=0;finished=false;renderWord(words[0]);}playing=true;
+  document.getElementById('playIcon').style.display='none';document.getElementById('pauseIcon').style.display='';
+  timer=setTimeout(tick,getDelayForIndex(idx));}
+function stopPlay(){playing=false;clearTimeout(timer);document.getElementById('playIcon').style.display='';document.getElementById('pauseIcon').style.display='none';}
+function skip(n){const was=playing;if(playing)stopPlay();idx=Math.max(0,Math.min(words.length-1,idx+n));finished=false;
+  renderWord(words[idx]);updateProgress();saveProgress();if(was)startPlay();}
 
-// PDF.js loader
-let pdfJsReady = false;
-function loadPdfJs() {
-  return new Promise((resolve, reject) => {
-    if (pdfJsReady) return resolve();
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-    s.onload = () => {
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      pdfJsReady = true; resolve();
-    };
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
+// Scrub bar
+const scrubArea=document.getElementById('scrubArea');
+function scrubTo(e){const rect=scrubArea.getBoundingClientRect(),x=('touches'in e)?e.touches[0].clientX:e.clientX;
+  let pct=Math.max(0,Math.min(1,(x-rect.left)/rect.width));idx=Math.round(pct*(words.length-1));finished=false;renderWord(words[idx]);updateProgress();}
+scrubArea.addEventListener('mousedown',e=>{scrubbing=true;scrubArea.classList.add('scrubbing');scrubArea._was=playing;if(playing)stopPlay();scrubTo(e);});
+document.addEventListener('mousemove',e=>{if(scrubbing)scrubTo(e);});
+document.addEventListener('mouseup',()=>{if(scrubbing){scrubbing=false;scrubArea.classList.remove('scrubbing');saveProgress();if(scrubArea._was)startPlay();}});
+scrubArea.addEventListener('touchstart',e=>{scrubbing=true;scrubArea.classList.add('scrubbing');scrubArea._was=playing;if(playing)stopPlay();scrubTo(e);},{passive:true});
+scrubArea.addEventListener('touchmove',e=>{if(scrubbing)scrubTo(e);},{passive:true});
+scrubArea.addEventListener('touchend',()=>{if(scrubbing){scrubbing=false;scrubArea.classList.remove('scrubbing');saveProgress();if(scrubArea._was)startPlay();}});
+document.getElementById('readerWpm').addEventListener('input',()=>{if(playing){clearTimeout(timer);timer=setTimeout(tick,getDelayForIndex(idx));}updateProgress();});
+document.addEventListener('keydown',e=>{if(!document.getElementById('readerScreen').classList.contains('active'))return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.code==='Space'){e.preventDefault();togglePlay();}if(e.code==='ArrowLeft')skip(-1);if(e.code==='ArrowRight')skip(1);});
 
-// ══════════════════════════════════════
-//  READER
-// ══════════════════════════════════════
-function startNewReading() {
-  const text = document.getElementById('textInput').value;
-  const title = document.getElementById('titleInput').value || 'Untitled';
-  const wpm = parseInt(document.getElementById('wpmInput').value) || 250;
-  wordData = extractWordsAndMeta(text);
-  words = wordData.map(w => w.word);
-  if (words.length === 0) return;
+// ═══════ SUMMARY ═══════
+function showSummary(){const item=library.find(r=>r.id===activeId);if(!item){showLibrary();return;}
+  const elapsed=Math.round((Date.now()-readingStartTime)/1000),mins=Math.floor(elapsed/60),secs=elapsed%60;
+  const wpm=parseInt(document.getElementById('readerWpm').value)||350;
+  document.getElementById('summaryTitle').textContent=item.title;
+  document.getElementById('summaryStats').innerHTML=`
+    <div class="summary-stat"><span class="summary-stat-val">${item.totalWords.toLocaleString()}</span><span class="summary-stat-label">Words</span></div>
+    <div class="summary-stat"><span class="summary-stat-val">${wpm}</span><span class="summary-stat-label">WPM</span></div>
+    <div class="summary-stat"><span class="summary-stat-val">${mins}m ${secs}s</span><span class="summary-stat-label">Session</span></div>`;
+  document.getElementById('summaryBody').innerHTML='<span class="summary-loading">Generating summary...</span>';
+  show('summaryScreen');generateSummary(item.text);}
 
-  const id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-  const reading = { id, title, text, wpm, currentIndex: 0, totalWords: words.length, createdAt: Date.now() };
-  library.unshift(reading);
-  saveLib();
-  openReader(reading);
-}
+function generateSummary(text){const body=document.getElementById('summaryBody');const trimmed=text.length>5000?text.slice(0,5000)+'...':text;
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
+      messages:[{role:'user',content:`You are a reading assistant. The user just finished speed-reading the following text. Provide a structured summary with key milestones and takeaways so they remember what they read. Use clear sections and bullet points. Write in the same language as the text.\n\nText:\n${trimmed}`}]})})
+  .then(r=>r.json()).then(data=>{const t=data.content?.map(b=>b.text||'').join('')||'';if(t)body.textContent=t;else fallbackSummary(trimmed,body);})
+  .catch(()=>fallbackSummary(trimmed,body));}
 
-function resumeReading(id) {
-  const item = library.find(r => r.id === id);
-  if (!item) return;
-  wordData = extractWordsAndMeta(item.text);
-  words = wordData.map(w => w.word);
-  openReader(item);
-}
+function fallbackSummary(text,body){const sentences=text.replace(/\n+/g,' ').split(/(?<=[.?!])\s+/).filter(s=>s.trim().length>10);
+  if(sentences.length<=3){body.textContent='Short reading:\n\n'+sentences.join(' ');return;}
+  const picks=[],step=Math.max(1,Math.floor(sentences.length/6));picks.push(sentences[0].trim());
+  for(let i=step;i<sentences.length-1;i+=step){if(picks.length>=5)break;const s=sentences[i].trim();if(s.length>15)picks.push(s);}
+  const last=sentences[sentences.length-1].trim();if(last.length>10&&!picks.includes(last))picks.push(last);
+  let summary='Key milestones:\n\n';picks.forEach((s,i)=>{let c=s.trim();if(c.length>250)c=c.slice(0,250)+'...';if(c)summary+=`${i+1}. ${c}\n\n`;});
+  body.textContent=summary.trim();}
+function restartReading(){const item=library.find(r=>r.id===activeId);if(!item)return;
+  item.currentIndex=0;saveLib();wordData=extractWordsAndMeta(item.text);words=wordData.map(w=>w.word);headings=extractHeadings(item.text);openReader(item);}
 
-function openReader(reading) {
-  activeId = reading.id;
-  idx = reading.currentIndex || 0;
-  finished = false;
-  playing = false;
-  document.getElementById('readerWpm').value = reading.wpm;
-  document.getElementById('readerTitle').textContent = reading.title;
-  document.getElementById('playIcon').style.display = '';
-  document.getElementById('pauseIcon').style.display = 'none';
-
-  if (idx >= words.length) {
-    idx = words.length;
-    finished = true;
-    renderFinished();
-  } else {
-    renderWord(words[idx]);
-  }
-  updateProgress();
-  show('readerScreen');
-}
-
-function exitReader() {
-  stopPlay();
-  saveProgress();
-  activeId = null;
-  showLibrary();
-}
-
-function deleteReading(id) {
-  library = library.filter(r => r.id !== id);
-  saveLib();
-  renderLibrary();
-}
-
-function saveProgress() {
-  if (!activeId) return;
-  const wpm = parseInt(document.getElementById('readerWpm').value) || 250;
-  const r = library.find(x => x.id === activeId);
-  if (r) { r.currentIndex = idx; r.wpm = wpm; saveLib(); }
-}
-
-// Playback
-function getBaseMs() {
-  const wpm = parseInt(document.getElementById('readerWpm').value) || 250;
-  return (60 / wpm) * 1000;
-}
-
-function getDelayForIndex(i) {
-  const base = getBaseMs();
-  const meta = wordData[i];
-  return base + (meta ? base * meta.pause : 0);
-}
-
-function tick() {
-  idx++;
-  if (idx >= words.length) {
-    idx = words.length;
-    finished = true;
-    stopPlay();
-    renderFinished();
-    updateProgress();
-    saveProgress();
-    return;
-  }
-  renderWord(words[idx]);
-  updateProgress();
-  saveProgress();
-  timer = setTimeout(tick, getDelayForIndex(idx));
-}
-
-function togglePlay() { playing ? stopPlay() : startPlay(); }
-
-function startPlay() {
-  if (finished) { idx = 0; finished = false; renderWord(words[0]); }
-  playing = true;
-  document.getElementById('playIcon').style.display = 'none';
-  document.getElementById('pauseIcon').style.display = '';
-  timer = setTimeout(tick, getDelayForIndex(idx));
-}
-
-function stopPlay() {
-  playing = false;
-  clearTimeout(timer);
-  document.getElementById('playIcon').style.display = '';
-  document.getElementById('pauseIcon').style.display = 'none';
-}
-
-function skip(n) {
-  const was = playing;
-  if (playing) stopPlay();
-  idx = Math.max(0, Math.min(words.length - 1, idx + n));
-  finished = false;
-  renderWord(words[idx]);
-  updateProgress();
-  saveProgress();
-  if (was) startPlay();
-}
-
-// Live WPM change
-document.getElementById('readerWpm').addEventListener('input', () => {
-  if (playing) { clearTimeout(timer); timer = setTimeout(tick, getDelayForIndex(idx)); }
-  updateProgress();
-});
-
-// Keyboard
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('readerScreen').classList.contains('active')) return;
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-  if (e.code === 'ArrowLeft') skip(-1);
-  if (e.code === 'ArrowRight') skip(1);
-});
-
-// ══════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════
-loadLib();
-renderLibrary();
-
-// Save progress when iOS kills the app (swipe up), tab switch, or browser close
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveProgress(); });
-window.addEventListener('pagehide', saveProgress);
-window.addEventListener('beforeunload', saveProgress);
-window.addEventListener('freeze', saveProgress);   // Page Lifecycle API
+// ═══════ INIT ═══════
+loadLib();renderLibrary();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveProgress();});
+window.addEventListener('pagehide',saveProgress);window.addEventListener('beforeunload',saveProgress);window.addEventListener('freeze',saveProgress);
 </script>
 </body>
 </html>
