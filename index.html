@@ -100,14 +100,15 @@ input,textarea,button{font-family:inherit}
 .scrub-area:hover .scrub-handle,.scrub-area.scrubbing .scrub-handle{opacity:1}
 
 /* ── Summary ── */
-.summary-wrap{position:relative;z-index:1;width:100%;max-width:640px;padding:2rem 1.5rem 4rem;display:flex;flex-direction:column}
+.summary-wrap{position:relative;z-index:1;width:100%;max-width:700px;padding:2rem 1.5rem 4rem;display:flex;flex-direction:column}
 .summary-title{font-size:1.2rem;font-weight:800;margin-bottom:.3rem}
-.summary-stats{display:flex;gap:1.2rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.summary-stats{display:flex;gap:1.2rem;margin-bottom:1rem;flex-wrap:wrap}
 .summary-stat{display:flex;flex-direction:column;gap:.05rem}
 .summary-stat-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--accent)}
 .summary-stat-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.summary-body{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;line-height:1.75;font-size:.85rem;color:var(--text);white-space:pre-wrap;flex:1;overflow:auto;min-height:120px}
-.summary-loading{color:var(--muted);font-style:italic}
+.summary-map{background:var(--surface);border:1px solid var(--border);border-radius:12px;flex:1;overflow:hidden;min-height:380px;position:relative}
+.summary-map svg{width:100%;height:100%;display:block}
+.summary-loading{color:var(--muted);font-style:italic;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.85rem}
 .summary-actions{display:flex;gap:.75rem;margin-top:1.2rem}
 .summary-btn{flex:1;padding:.7rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;text-align:center}
 .summary-btn:active{border-color:var(--accent)}
@@ -198,7 +199,9 @@ input,textarea,button{font-family:inherit}
   <div style="font-size:2rem;margin-bottom:.3rem">👍</div>
   <h2 class="summary-title" id="summaryTitle"></h2>
   <div class="summary-stats" id="summaryStats"></div>
-  <div class="summary-body" id="summaryBody"></div>
+  <div class="summary-map" id="summaryMap">
+    <div class="summary-loading" id="summaryLoading">Generating map...</div>
+  </div>
   <div class="summary-actions">
     <button class="summary-btn" onclick="restartReading()">Read Again</button>
     <button class="summary-btn summary-btn-primary" onclick="showLibrary()">Done</button>
@@ -386,23 +389,150 @@ function showSummary(){const item=library.find(r=>r.id===activeId);if(!item){sho
     <div class="summary-stat"><span class="summary-stat-val">${item.totalWords.toLocaleString()}</span><span class="summary-stat-label">Words</span></div>
     <div class="summary-stat"><span class="summary-stat-val">${wpm}</span><span class="summary-stat-label">WPM</span></div>
     <div class="summary-stat"><span class="summary-stat-val">${mins}m ${secs}s</span><span class="summary-stat-label">Session</span></div>`;
-  document.getElementById('summaryBody').innerHTML='<span class="summary-loading">Generating summary...</span>';
-  show('summaryScreen');generateSummary(item.text);}
+  document.getElementById('summaryLoading').style.display='flex';
+  document.getElementById('summaryMap').querySelectorAll('svg').forEach(s=>s.remove());
+  show('summaryScreen');generateGraphicSummary(item.text,item.title);}
 
-function generateSummary(text){const body=document.getElementById('summaryBody');const trimmed=text.length>5000?text.slice(0,5000)+'...':text;
+function generateGraphicSummary(text,title){
+  const trimmed=text.length>5000?text.slice(0,5000)+'...':text;
   fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
-      messages:[{role:'user',content:`You are a reading assistant. The user just finished speed-reading the following text. Provide a structured summary with key milestones and takeaways so they remember what they read. Use clear sections and bullet points. Write in the same language as the text.\n\nText:\n${trimmed}`}]})})
-  .then(r=>r.json()).then(data=>{const t=data.content?.map(b=>b.text||'').join('')||'';if(t)body.textContent=t;else fallbackSummary(trimmed,body);})
-  .catch(()=>fallbackSummary(trimmed,body));}
+      messages:[{role:'user',content:`Analyze this text and return ONLY a JSON object (no markdown, no backticks) for a mind map. Format:
+{"center":"Main Topic 2-4 words","branches":[{"label":"Category","nodes":["concept 1","concept 2","concept 3"]}]}
+Rules:
+- center: main theme, 2-4 words
+- 4 to 6 branches, each a thematic category (label: 1-3 words)
+- Each branch: 2-3 nodes, each a coherent concept (2-5 words, not single keywords)
+- Write in the same language as the text
+- Focus on concepts that trigger memory: people, events, mechanisms, turning points
 
-function fallbackSummary(text,body){const sentences=text.replace(/\n+/g,' ').split(/(?<=[.?!])\s+/).filter(s=>s.trim().length>10);
-  if(sentences.length<=3){body.textContent='Short reading:\n\n'+sentences.join(' ');return;}
-  const picks=[],step=Math.max(1,Math.floor(sentences.length/6));picks.push(sentences[0].trim());
-  for(let i=step;i<sentences.length-1;i+=step){if(picks.length>=5)break;const s=sentences[i].trim();if(s.length>15)picks.push(s);}
-  const last=sentences[sentences.length-1].trim();if(last.length>10&&!picks.includes(last))picks.push(last);
-  let summary='Key milestones:\n\n';picks.forEach((s,i)=>{let c=s.trim();if(c.length>250)c=c.slice(0,250)+'...';if(c)summary+=`${i+1}. ${c}\n\n`;});
-  body.textContent=summary.trim();}
+Text:\n${trimmed}`}]})})
+  .then(r=>r.json())
+  .then(data=>{
+    const t=data.content?.map(b=>b.text||'').join('')||'';
+    try{const clean=t.replace(/```json|```/g,'').trim();const m=JSON.parse(clean);
+      if(m.center&&m.branches)return renderMindMapSVG(m);}catch(e){console.error('AI parse',e);}
+    fallbackMindMap(text,title);
+  }).catch(()=>fallbackMindMap(text,title));
+}
+
+function fallbackMindMap(text,title){
+  const sents=text.replace(/\n+/g,' ').split(/(?<=[.?!])\s+/).filter(s=>s.trim().length>15);
+  const branches=[];
+  const step=Math.max(1,Math.floor(sents.length/5));
+  for(let i=0;i<sents.length&&branches.length<5;i+=step){
+    const s=sents[i].trim();
+    const words=s.split(/\s+/);
+    const label=words.slice(0,2).join(' ');
+    const nodes=[];
+    for(let j=0;j<words.length&&nodes.length<3;j+=Math.max(1,Math.floor(words.length/3))){
+      const chunk=words.slice(j,j+4).join(' ');
+      if(chunk.length>3&&chunk.length<35)nodes.push(chunk);
+    }
+    if(nodes.length)branches.push({label,nodes});
+  }
+  renderMindMapSVG({center:title.slice(0,30),branches});
+}
+
+// Color palette for branches (works on dark bg)
+const BRANCH_COLORS=[
+  {fill:'#0F6E56',stroke:'#5DCAA5',text:'#9FE1CB',nodeFill:'#085041',nodeText:'#5DCAA5'},  // teal
+  {fill:'#534AB7',stroke:'#AFA9EC',text:'#CECBF6',nodeFill:'#3C3489',nodeText:'#AFA9EC'},  // purple
+  {fill:'#993C1D',stroke:'#F0997B',text:'#F5C4B3',nodeFill:'#712B13',nodeText:'#F0997B'},  // coral
+  {fill:'#185FA5',stroke:'#85B7EB',text:'#B5D4F4',nodeFill:'#0C447C',nodeText:'#85B7EB'},  // blue
+  {fill:'#3B6D11',stroke:'#97C459',text:'#C0DD97',nodeFill:'#27500A',nodeText:'#97C459'},  // green
+  {fill:'#993556',stroke:'#ED93B1',text:'#F4C0D1',nodeFill:'#72243E',nodeText:'#ED93B1'},  // pink
+];
+
+function measureText(str,fontSize){return str.length*(fontSize*0.58);}
+
+function renderMindMapSVG(data){
+  document.getElementById('summaryLoading').style.display='none';
+  const container=document.getElementById('summaryMap');
+
+  const branches=data.branches||[];
+  const bc=branches.length;
+  // Layout: center at (340,260), branches radiate outward
+  const CX=340,CY=260,VW=680;
+  // Pre-defined positions for 4-6 branches to avoid overlap
+  const positions=[
+    [{x:130,y:100},{x:540,y:100},{x:80,y:340},{x:540,y:320},{x:300,y:470}],                          // 5
+    [{x:130,y:90},{x:540,y:90},{x:60,y:300},{x:560,y:300},{x:160,y:470},{x:500,y:470}],               // 6
+    [{x:140,y:110},{x:530,y:110},{x:100,y:350},{x:530,y:350}],                                        // 4
+    [{x:140,y:130},{x:530,y:130},{x:340,y:440}],                                                      // 3
+  ];
+  let posSet;
+  if(bc>=6)posSet=positions[1];
+  else if(bc===5)posSet=positions[0];
+  else if(bc===4)posSet=positions[2];
+  else posSet=positions[3];
+
+  let svgContent='';
+
+  // Lines from center to branches
+  branches.forEach((br,i)=>{
+    if(i>=posSet.length)return;
+    const p=posSet[i];
+    const col=BRANCH_COLORS[i%BRANCH_COLORS.length];
+    svgContent+=`<line x1="${CX}" y1="${CY}" x2="${p.x}" y2="${p.y}" stroke="${col.stroke}" stroke-width="1" opacity="0.25"/>`;
+  });
+
+  // Branch labels + child nodes
+  branches.forEach((br,i)=>{
+    if(i>=posSet.length)return;
+    const p=posSet[i];
+    const col=BRANCH_COLORS[i%BRANCH_COLORS.length];
+    const label=br.label||'';
+    const lw=Math.max(measureText(label,14)+28,120);
+    const lh=36;
+
+    // Branch label pill
+    svgContent+=`<rect x="${p.x-lw/2}" y="${p.y-lh/2}" width="${lw}" height="${lh}" rx="8" fill="${col.fill}" stroke="${col.stroke}" stroke-width="0.5"/>`;
+    svgContent+=`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" fill="${col.text}" font-family="Outfit,sans-serif" font-size="13" font-weight="600">${esc(label)}</text>`;
+
+    // Child nodes - stack vertically below branch, offset to the side that has more room
+    const nodes=br.nodes||[];
+    const goRight=p.x<CX;
+    nodes.forEach((node,j)=>{
+      const ny=p.y+lh/2+12+(j*36);
+      const nw=Math.max(measureText(node,11)+20,100);
+      const nh=28;
+      // Offset nodes slightly from branch center
+      const nx=goRight?p.x+15:p.x-15;
+
+      // Connector line
+      svgContent+=`<line x1="${p.x}" y1="${p.y+lh/2}" x2="${nx}" y2="${ny}" stroke="${col.stroke}" stroke-width="0.5" opacity="0.2"/>`;
+
+      // Node pill
+      svgContent+=`<rect x="${nx-nw/2}" y="${ny-nh/2}" width="${nw}" height="${nh}" rx="6" fill="${col.nodeFill}" stroke="${col.stroke}" stroke-width="0.5" opacity="0.7"/>`;
+      svgContent+=`<text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central" fill="${col.nodeText}" font-family="'JetBrains Mono',monospace" font-size="11">${esc(node)}</text>`;
+    });
+  });
+
+  // Calculate total height needed
+  let maxY=CY+30;
+  branches.forEach((br,i)=>{
+    if(i>=posSet.length)return;
+    const p=posSet[i];
+    const nodesBottom=p.y+18+12+((br.nodes||[]).length)*36+14;
+    if(nodesBottom>maxY)maxY=nodesBottom;
+  });
+  const VH=Math.max(maxY+20,520);
+
+  // Center node
+  const centerLabel=data.center||'Summary';
+  const cw=Math.max(measureText(centerLabel,15)+36,160);
+  const ch=44;
+  const centerSvg=
+    `<rect x="${CX-cw/2}" y="${CY-ch/2}" width="${cw}" height="${ch}" rx="12" fill="#085041" stroke="#2dd882" stroke-width="1.5"/>`+
+    `<text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="central" fill="#e8e6f0" font-family="Outfit,sans-serif" font-size="15" font-weight="700">${esc(centerLabel)}</text>`;
+
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
+  svg.setAttribute('width','100%');
+  svg.innerHTML=svgContent+centerSvg;
+  container.appendChild(svg);
+}
 function restartReading(){const item=library.find(r=>r.id===activeId);if(!item)return;
   item.currentIndex=0;saveLib();wordData=extractWordsAndMeta(item.text);words=wordData.map(w=>w.word);headings=extractHeadings(item.text);openReader(item);}
 
