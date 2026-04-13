@@ -397,141 +397,167 @@ function generateGraphicSummary(text,title){
   const trimmed=text.length>5000?text.slice(0,5000)+'...':text;
   fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
-      messages:[{role:'user',content:`Analyze this text and return ONLY a JSON object (no markdown, no backticks) for a mind map. Format:
-{"center":"Main Topic 2-4 words","branches":[{"label":"Category","nodes":["concept 1","concept 2","concept 3"]}]}
+      messages:[{role:'user',content:`Analyze this text and return ONLY a JSON object (no markdown, no backticks) for a structured summary map. Format:
+{"center":"Main Topic 2-4 words","subtitle":"One-line description max 6 words","columns":[{"label":"Category 1-3 words","nodes":["concept 2-4 words","concept 2-4 words","concept 2-4 words"]},...],"bottom":[{"label":"Category","nodes":["keyword","keyword","keyword"]}]}
 Rules:
-- center: main theme, 2-4 words
-- 4 to 6 branches, each a thematic category (label: 1-3 words)
-- Each branch: 2-3 nodes, each a coherent concept (2-5 words, not single keywords)
+- center: main theme in 2-4 words
+- subtitle: one-line context, max 6 words
+- columns: exactly 3 main categories, each with 3-4 concept nodes
+- bottom: 1-2 supporting categories with 2-3 short keywords each
+- Every node must be 2-5 words, a coherent concept (not a single keyword)
 - Write in the same language as the text
-- Focus on concepts that trigger memory: people, events, mechanisms, turning points
+- Focus on what triggers memory: people, events, mechanisms, turning points, key terms
 
 Text:\n${trimmed}`}]})})
   .then(r=>r.json())
   .then(data=>{
     const t=data.content?.map(b=>b.text||'').join('')||'';
     try{const clean=t.replace(/```json|```/g,'').trim();const m=JSON.parse(clean);
-      if(m.center&&m.branches)return renderMindMapSVG(m);}catch(e){console.error('AI parse',e);}
-    fallbackMindMap(text,title);
-  }).catch(()=>fallbackMindMap(text,title));
+      if(m.center&&m.columns)return renderColumnMap(m);}catch(e){console.error('AI parse',e);}
+    fallbackColumnMap(text,title);
+  }).catch(()=>fallbackColumnMap(text,title));
 }
 
-function fallbackMindMap(text,title){
+function fallbackColumnMap(text,title){
   const sents=text.replace(/\n+/g,' ').split(/(?<=[.?!])\s+/).filter(s=>s.trim().length>15);
-  const branches=[];
-  const step=Math.max(1,Math.floor(sents.length/5));
-  for(let i=0;i<sents.length&&branches.length<5;i+=step){
-    const s=sents[i].trim();
-    const words=s.split(/\s+/);
-    const label=words.slice(0,2).join(' ');
-    const nodes=[];
-    for(let j=0;j<words.length&&nodes.length<3;j+=Math.max(1,Math.floor(words.length/3))){
-      const chunk=words.slice(j,j+4).join(' ');
-      if(chunk.length>3&&chunk.length<35)nodes.push(chunk);
-    }
-    if(nodes.length)branches.push({label,nodes});
+  const columns=[];
+  const chunk=Math.max(1,Math.floor(sents.length/3));
+  for(let c=0;c<3&&c*chunk<sents.length;c++){
+    const slice=sents.slice(c*chunk,(c+1)*chunk);
+    const nodes=slice.slice(0,4).map(s=>{
+      const w=s.split(/\s+/).slice(0,4).join(' ');
+      return w.length>30?w.slice(0,28)+'..':w;
+    });
+    const label=nodes[0]?nodes[0].split(/\s+/).slice(0,2).join(' '):'Section '+(c+1);
+    columns.push({label,nodes});
   }
-  renderMindMapSVG({center:title.slice(0,30),branches});
+  renderColumnMap({center:title.slice(0,30),subtitle:'',columns,bottom:[]});
 }
 
-// Color palette for branches (works on dark bg)
-const BRANCH_COLORS=[
-  {fill:'#0F6E56',stroke:'#5DCAA5',text:'#9FE1CB',nodeFill:'#085041',nodeText:'#5DCAA5'},  // teal
-  {fill:'#534AB7',stroke:'#AFA9EC',text:'#CECBF6',nodeFill:'#3C3489',nodeText:'#AFA9EC'},  // purple
-  {fill:'#993C1D',stroke:'#F0997B',text:'#F5C4B3',nodeFill:'#712B13',nodeText:'#F0997B'},  // coral
-  {fill:'#185FA5',stroke:'#85B7EB',text:'#B5D4F4',nodeFill:'#0C447C',nodeText:'#85B7EB'},  // blue
-  {fill:'#3B6D11',stroke:'#97C459',text:'#C0DD97',nodeFill:'#27500A',nodeText:'#97C459'},  // green
-  {fill:'#993556',stroke:'#ED93B1',text:'#F4C0D1',nodeFill:'#72243E',nodeText:'#ED93B1'},  // pink
+// Color schemes for columns and bottom groups
+const COL_COLORS=[
+  {head:'#0F6E56',headStroke:'#5DCAA5',headText:'#9FE1CB',pill:'#085041',pillStroke:'#5DCAA5',pillText:'#5DCAA5',line:'#5DCAA5'},
+  {head:'#3C3489',headStroke:'#AFA9EC',headText:'#CECBF6',pill:'#26215C',pillStroke:'#AFA9EC',pillText:'#AFA9EC',line:'#AFA9EC'},
+  {head:'#185FA5',headStroke:'#85B7EB',headText:'#B5D4F4',pill:'#0C447C',pillStroke:'#85B7EB',pillText:'#85B7EB',line:'#85B7EB'},
+];
+const BOT_COLORS=[
+  {head:'#712B13',headStroke:'#F0997B',headText:'#F5C4B3',pill:'#4A1B0C',pillStroke:'#F0997B',pillText:'#F0997B',line:'#F0997B'},
+  {head:'#27500A',headStroke:'#97C459',headText:'#C0DD97',pill:'#173404',pillStroke:'#97C459',pillText:'#97C459',line:'#97C459'},
 ];
 
-function measureText(str,fontSize){return str.length*(fontSize*0.58);}
+function mt(str,fs){return str.length*(fs*0.6);}
 
-function renderMindMapSVG(data){
+function renderColumnMap(data){
   document.getElementById('summaryLoading').style.display='none';
   const container=document.getElementById('summaryMap');
-
-  const branches=data.branches||[];
-  const bc=branches.length;
-  // Layout: center at (340,260), branches radiate outward
-  const CX=340,CY=260,VW=680;
-  // Pre-defined positions for 4-6 branches to avoid overlap
-  const positions=[
-    [{x:130,y:100},{x:540,y:100},{x:80,y:340},{x:540,y:320},{x:300,y:470}],                          // 5
-    [{x:130,y:90},{x:540,y:90},{x:60,y:300},{x:560,y:300},{x:160,y:470},{x:500,y:470}],               // 6
-    [{x:140,y:110},{x:530,y:110},{x:100,y:350},{x:530,y:350}],                                        // 4
-    [{x:140,y:130},{x:530,y:130},{x:340,y:440}],                                                      // 3
-  ];
-  let posSet;
-  if(bc>=6)posSet=positions[1];
-  else if(bc===5)posSet=positions[0];
-  else if(bc===4)posSet=positions[2];
-  else posSet=positions[3];
-
-  let svgContent='';
-
-  // Lines from center to branches
-  branches.forEach((br,i)=>{
-    if(i>=posSet.length)return;
-    const p=posSet[i];
-    const col=BRANCH_COLORS[i%BRANCH_COLORS.length];
-    svgContent+=`<line x1="${CX}" y1="${CY}" x2="${p.x}" y2="${p.y}" stroke="${col.stroke}" stroke-width="1" opacity="0.25"/>`;
-  });
-
-  // Branch labels + child nodes
-  branches.forEach((br,i)=>{
-    if(i>=posSet.length)return;
-    const p=posSet[i];
-    const col=BRANCH_COLORS[i%BRANCH_COLORS.length];
-    const label=br.label||'';
-    const lw=Math.max(measureText(label,14)+28,120);
-    const lh=36;
-
-    // Branch label pill
-    svgContent+=`<rect x="${p.x-lw/2}" y="${p.y-lh/2}" width="${lw}" height="${lh}" rx="8" fill="${col.fill}" stroke="${col.stroke}" stroke-width="0.5"/>`;
-    svgContent+=`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" fill="${col.text}" font-family="Outfit,sans-serif" font-size="13" font-weight="600">${esc(label)}</text>`;
-
-    // Child nodes - stack vertically below branch, offset to the side that has more room
-    const nodes=br.nodes||[];
-    const goRight=p.x<CX;
-    nodes.forEach((node,j)=>{
-      const ny=p.y+lh/2+12+(j*36);
-      const nw=Math.max(measureText(node,11)+20,100);
-      const nh=28;
-      // Offset nodes slightly from branch center
-      const nx=goRight?p.x+15:p.x-15;
-
-      // Connector line
-      svgContent+=`<line x1="${p.x}" y1="${p.y+lh/2}" x2="${nx}" y2="${ny}" stroke="${col.stroke}" stroke-width="0.5" opacity="0.2"/>`;
-
-      // Node pill
-      svgContent+=`<rect x="${nx-nw/2}" y="${ny-nh/2}" width="${nw}" height="${nh}" rx="6" fill="${col.nodeFill}" stroke="${col.stroke}" stroke-width="0.5" opacity="0.7"/>`;
-      svgContent+=`<text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central" fill="${col.nodeText}" font-family="'JetBrains Mono',monospace" font-size="11">${esc(node)}</text>`;
-    });
-  });
-
-  // Calculate total height needed
-  let maxY=CY+30;
-  branches.forEach((br,i)=>{
-    if(i>=posSet.length)return;
-    const p=posSet[i];
-    const nodesBottom=p.y+18+12+((br.nodes||[]).length)*36+14;
-    if(nodesBottom>maxY)maxY=nodesBottom;
-  });
-  const VH=Math.max(maxY+20,520);
-
-  // Center node
+  const VW=680;
+  const columns=data.columns||[];
+  const bottom=data.bottom||[];
   const centerLabel=data.center||'Summary';
-  const cw=Math.max(measureText(centerLabel,15)+36,160);
-  const ch=44;
-  const centerSvg=
-    `<rect x="${CX-cw/2}" y="${CY-ch/2}" width="${cw}" height="${ch}" rx="12" fill="#085041" stroke="#2dd882" stroke-width="1.5"/>`+
-    `<text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="central" fill="#e8e6f0" font-family="Outfit,sans-serif" font-size="15" font-weight="700">${esc(centerLabel)}</text>`;
+  const subtitle=data.subtitle||'';
 
-  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
-  svg.setAttribute('width','100%');
-  svg.innerHTML=svgContent+centerSvg;
-  container.appendChild(svg);
+  let svg='';
+
+  // ── Center topic ──
+  const cw=Math.max(mt(centerLabel,16)+40,200);
+  const ch=subtitle?52:44;
+  svg+=`<rect x="${340-cw/2}" y="24" width="${cw}" height="${ch}" rx="12" fill="#085041" stroke="#2dd882" stroke-width="1.5"/>`;
+  svg+=`<text x="340" y="${subtitle?40:50}" text-anchor="middle" dominant-baseline="central" fill="#e8e6f0" font-family="Outfit,sans-serif" font-size="16" font-weight="700">${esc(centerLabel)}</text>`;
+  if(subtitle) svg+=`<text x="340" y="60" text-anchor="middle" dominant-baseline="central" fill="#5DCAA5" font-family="Outfit,sans-serif" font-size="11">${esc(subtitle)}</text>`;
+
+  const topY=24+ch;
+
+  // ── Columns ──
+  const colCount=Math.min(columns.length,3);
+  const colW=186;
+  const gap=(VW-colCount*colW)/(colCount+1);
+  const headH=38;
+  const pillH=30;
+  const pillGap=12;
+  const colStartY=topY+40;
+
+  // Lines from center to column tops
+  columns.forEach((_,i)=>{
+    if(i>=3)return;
+    const cx=gap+(colW/2)+i*(colW+gap);
+    const col=COL_COLORS[i];
+    svg+=`<line x1="340" y1="${topY}" x2="${cx}" y2="${colStartY}" stroke="${col.line}" stroke-width="1" opacity="0.2"/>`;
+  });
+
+  let maxColBottom=colStartY;
+
+  columns.forEach((column,i)=>{
+    if(i>=3)return;
+    const col=COL_COLORS[i];
+    const cx=gap+(colW/2)+i*(colW+gap);
+    const lx=gap+i*(colW+gap);
+    const label=column.label||'';
+    const nodes=column.nodes||[];
+
+    // Column header
+    svg+=`<rect x="${lx}" y="${colStartY}" width="${colW}" height="${headH}" rx="8" fill="${col.head}" stroke="${col.headStroke}" stroke-width="0.5"/>`;
+    svg+=`<text x="${cx}" y="${colStartY+headH/2}" text-anchor="middle" dominant-baseline="central" fill="${col.headText}" font-family="Outfit,sans-serif" font-size="13" font-weight="600">${esc(label)}</text>`;
+
+    // Node pills stacked below
+    let ny=colStartY+headH+pillGap;
+    nodes.forEach((node,j)=>{
+      if(j>=4)return;
+      // Connector line
+      svg+=`<line x1="${cx}" y1="${ny-pillGap}" x2="${cx}" y2="${ny}" stroke="${col.line}" stroke-width="0.5" opacity="0.1"/>`;
+      // Pill
+      svg+=`<rect x="${lx}" y="${ny}" width="${colW}" height="${pillH}" rx="6" fill="${col.pill}" stroke="${col.pillStroke}" stroke-width="0.5" opacity="0.6"/>`;
+      svg+=`<text x="${cx}" y="${ny+pillH/2}" text-anchor="middle" dominant-baseline="central" fill="${col.pillText}" font-family="monospace" font-size="11">${esc(node)}</text>`;
+      ny+=pillH+pillGap;
+    });
+    if(ny>maxColBottom) maxColBottom=ny;
+  });
+
+  // ── Bottom groups ──
+  if(bottom.length>0){
+    const botStartY=maxColBottom+20;
+    const botCount=Math.min(bottom.length,2);
+    const botW=botCount===1?400:280;
+    const botGap=(VW-botCount*botW)/(botCount+1);
+
+    bottom.forEach((group,i)=>{
+      if(i>=2)return;
+      const col=BOT_COLORS[i%BOT_COLORS.length];
+      const bx=botGap+i*(botW+botGap);
+      const bcx=bx+botW/2;
+      const label=group.label||'';
+      const nodes=group.nodes||[];
+
+      // Connector from columns area
+      svg+=`<line x1="${bcx}" y1="${maxColBottom}" x2="${bcx}" y2="${botStartY}" stroke="${col.line}" stroke-width="1" opacity="0.12"/>`;
+
+      // Header
+      svg+=`<rect x="${bx}" y="${botStartY}" width="${botW}" height="${headH}" rx="8" fill="${col.head}" stroke="${col.headStroke}" stroke-width="0.5"/>`;
+      svg+=`<text x="${bcx}" y="${botStartY+headH/2}" text-anchor="middle" dominant-baseline="central" fill="${col.headText}" font-family="Outfit,sans-serif" font-size="13" font-weight="600">${esc(label)}</text>`;
+
+      // Nodes laid out horizontally
+      const nodeW=Math.floor((botW-((nodes.length-1)*8))/Math.max(nodes.length,1));
+      let nx=bx;
+      nodes.forEach((node,j)=>{
+        if(j>=4)return;
+        const nw=Math.max(mt(node,11)+16,nodeW);
+        const actualW=Math.min(nw,nodeW);
+        svg+=`<line x1="${bcx}" y1="${botStartY+headH}" x2="${nx+actualW/2}" y2="${botStartY+headH+pillGap}" stroke="${col.line}" stroke-width="0.5" opacity="0.12"/>`;
+        svg+=`<rect x="${nx}" y="${botStartY+headH+pillGap}" width="${actualW}" height="${pillH}" rx="6" fill="${col.pill}" stroke="${col.pillStroke}" stroke-width="0.5" opacity="0.6"/>`;
+        svg+=`<text x="${nx+actualW/2}" y="${botStartY+headH+pillGap+pillH/2}" text-anchor="middle" dominant-baseline="central" fill="${col.pillText}" font-family="monospace" font-size="11">${esc(node.length>18?node.slice(0,17)+'..':node)}</text>`;
+        nx+=actualW+8;
+      });
+
+      if(botStartY+headH+pillGap+pillH+20>maxColBottom) maxColBottom=botStartY+headH+pillGap+pillH+20;
+    });
+    maxColBottom+=10;
+  }
+
+  const VH=Math.max(maxColBottom+20,400);
+  const svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svgEl.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
+  svgEl.setAttribute('width','100%');
+  svgEl.innerHTML=svg;
+  container.appendChild(svgEl);
 }
 function restartReading(){const item=library.find(r=>r.id===activeId);if(!item)return;
   item.currentIndex=0;saveLib();wordData=extractWordsAndMeta(item.text);words=wordData.map(w=>w.word);headings=extractHeadings(item.text);openReader(item);}
